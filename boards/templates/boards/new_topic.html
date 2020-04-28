@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Start a New Topic{% endblock %}
+
+{% block navbutton %}
+<ul class="navbar-nav mr-auto">
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle mr-1" href="#" data-toggle="dropdown">
+      New topic
+    </a>
+    <div class="dropdown-menu dropdown-menu-left">
+      <a class="dropdown-item" href="{% url 'board_topics' board.pk %}">{{ board.name }}</a>
+      <a class="dropdown-item" href="{% url 'boards' %}">Boards</a>
+      <a class="dropdown-item" href="{% url 'home' %}">Home</a>
+    </div>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary btn-sm">Submit new topic</button>
+    <button class="btn dropdown-toggle btn-primary btn-sm" data-toggle="dropdown"
+      >Allowed editors<span class="caret"></span></button>
+ 		<ul class="dropdown-menu"  style="height:40%; overflow:hidden; overflow-y:scroll;">
+      {{ form2.allowed_editor|as_crispy_field }}
+    </ul>
+    <a href="{% url 'board_topics' board.pk %}"
+       class="btn btn-outline-primary btn-sm"
+       role="button">Cancel</a>
+    <br></br>
+    {{ form1.topic_subject|as_crispy_field }}
+    {{ form2.post_subject|as_crispy_field }}
+    {{ form2.message }}
+  </form>
+  <br>
+  <br>
+{% endblock %}

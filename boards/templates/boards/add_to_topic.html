@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% load boards_tags %}
+{% load martortags %}
+{% load crispy_forms_tags%}
+
+{% block title %}Post addition{% endblock %}
+
+{% block navbutton %}
+<ul class="navbar-nav mr-auto">
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle mr-1" href="#" data-toggle="dropdown">
+      Post addition
+    </a>
+    <div class="dropdown-menu dropdown-menu-left">
+      <a class="dropdown-item" href="{% url 'topic_posts' topic.board.pk topic.pk %}">{{ topic.topic_subject }}</a>
+      <a class="dropdown-item" href="{% url 'board_topics' topic.board.pk %}">{{ topic.board.name }}</a>
+      <a class="dropdown-item" href="{% url 'boards' %}">Boards</a>
+      <a class="dropdown-item" href="{% url 'home' %}">Home</a>
+    </div>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+  <form method="post" class="mb-2">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary btn-sm">Post contribution</button>
+    <button class="btn dropdown-toggle btn-primary btn-sm" data-toggle="dropdown"
+      >Allowed editors<span class="caret"></span></button>
+ 		<ul class="dropdown-menu">
+      {{ form.allowed_editor|as_crispy_field }}
+    </ul>
+    <a href="{% url 'topic_posts' topic.board.pk topic.pk %}"
+       class="btn btn-outline-primary btn-sm"
+       role="button">Cancel</a>
+    {{ form.post_subject|as_crispy_field }}
+    {{ form.message|as_crispy_field }}
+  </form>
+
+  {% get_last_n_posts topic 5 as last_posts %}
+  {% for post in last_posts %}
+    <div class="card-body p-2">
+      <div class="card mb-2 border-dark">
+        {% if post.post_subject %}
+          <div class="card-header text-black bg-grey py-2 px-3">{{ post.post_subject }}</div>
+        {% endif %}
+
+        <div class="row mb-4">
+          <small class="col test-left text-muted">created by: {{ post.created_by.username }}</small>
+          <small class="col text-muted">last updated by: {{post.updated_by }}</small>
+          <small class="col text-right text-muted"> last updated: {{ post.updated_at }}</small>
+        </div>
+        {{ post.get_message_as_markdown|safe_markdown }}
+      </div>
+    </div>
+  {% endfor %}
+  <br>
+  <br>
+{% endblock %}

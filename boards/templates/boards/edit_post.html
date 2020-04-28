@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load martortags %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit post{% endblock %}
+
+{% block navbutton %}
+<ul class="navbar-nav mr-auto">
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle mr-1" href="#" data-toggle="dropdown">
+      Edit contribution
+    </a>
+    <div class="dropdown-menu dropdown-menu-left">
+      <a class="dropdown-item" href="{% url 'topic_posts' post.topic.board.pk post.topic.pk %}">{{ post.topic.topic_subject }}</a>
+      <a class="dropdown-item" href="{% url 'board_topics' post.topic.board.pk %}">{{ post.topic.board.name }}</a>
+      <a class="dropdown-item" href="{% url 'boards' %}">Boards</a>
+      <a class="dropdown-item" href="{% url 'home' %}">Home</a>
+    </div>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+  <form method="post" class="mb-4">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary btn-sm">Save changes</button>
+    <button style="margin:1px" class="btn btn-primary btn-sm"
+            name="deleted_post_pk" value="{{ post.pk }}"
+            onclick="return Validate()">Delete contribtion</button>
+    <button class="btn dropdown-toggle btn-primary btn-sm" data-toggle="dropdown"
+      >Allowed editors<span class="caret"></span></button>
+    <ul class="dropdown-menu"  style="height:40%; overflow:hidden; overflow-y:scroll;">
+      {{ form.allowed_editor|as_crispy_field }}
+    </ul>
+    <a href="{% url 'topic_posts' post.topic.board.pk post.topic.pk %}"
+       class="btn btn-outline-secondary btn-sm"
+       role="button">Cancel</a>
+    <br></br>
+    {{ form.post_subject|as_crispy_field }}
+    {{ form.message }}
+  </form>
+  <br>
+  <br>
+{% endblock %}
+
+{% block javascript %}
+  <script src="{% static 'js/board.js' %}"></script>
+{% endblock %}

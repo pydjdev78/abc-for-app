@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Stock quotes{% endblock %}
+
+{% block stylesheet %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/container-styles.css' %}">
+{% endblock %}
+
+{% block navbutton %}
+<ul class="navbar-nav mr-auto">
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle mr-1" href="#" data-toggle="dropdown">
+      Stock quotes
+    </a>
+    <div class="dropdown-menu dropdown-menu-left">
+      <a class="dropdown-item" href="{% url 'home' %}">Home</a>
+    </div>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+{% now "Y-m-d" as current_date %}
+
+<form id="id_stockquote" method="post">
+{% csrf_token %}
+<a style="display: none">{{ form.quote_string }} </a>
+
+  <div class="d-flex">
+    <div>
+      <button class="btn btn-primary btn-sm"
+        onclick="return SubmitQuoteString('{{ form.quote_string.value }}')">Quote</button>
+    </div>
+
+    <div>
+      <button class="btn dropdown-toggle btn-primary btn-sm ml-1" data-toggle="dropdown"
+        >Portfolio's</button>
+        <ul class="dropdown-menu scroll" style="height:40%;">
+     		 	 {% for portfolio in portfolios %}
+     			   <li><input type="submit" class="btn btn-sm item_select" name="selected_portfolio"
+               value="{{ portfolio }}"></input></li>
+     			 {% endfor %}
+     		</ul>
+    </div>
+
+    <div>
+      <button class="btn dropdown-toggle btn-primary btn-sm ml-1" data-toggle="dropdown"
+        >Markets</button>
+        <ul class="dropdown-menu scroll" style="height:40%;">
+          {{ form.markets|as_crispy_field }}
+        </ul>
+    </div>
+
+    {% if user.is_authenticated %}
+      <div>
+        <button type="button" class="btn btn-primary btn-sm ml-1"
+          onclick="window.location.href='{% url 'portfolio' %}'">My portfolio</button>
+      </div>
+    {% endif %}
+
+    {% if form.selected_portfolio.value %}
+      <div>
+        <strong><a class="ml-4">Portfolio:</a><a class="ml-1">{{ form.selected_portfolio.value }}</a></strong>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="table-responsive text-nowrap" style="overflow: hidden">
+  <table id="dtHorizontalVerticalScroll" class="table table-striped mb-2 mt-1 table-sm" cellspacing="0" width="100%">
+    <thead class="custom-thead-grey">
+      <tr>
+        <th width="17%">Company</th>
+        <th width="10%">Symbol</th>
+        <th width="10%">Market</th>
+        <th width="7%">Currency</th>
+        <th width="2%"></th>
+        <th width="7%">Price</th>
+        <th width="7%">+/-</th>
+        <th width="7%">Pct</th>
+        <th width="7%">Low</th>
+        <th width="7%">High</th>
+        <th width="7%">Previous</th>
+        <th width="12%">Last trade</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for stock in stock_info %}
+      <tr>
+        <td width="17%"><a href="{% url 'stock_intraday' source stock.symbol %}">{{ stock.name|truncatechars:18 }}</a></td>
+        <td width="10%">{{ stock.symbol }}</td>
+        <td width="10%">{{ stock.stock_exchange_short|truncatechars:9 }}</td>
+        <td width="7%">{{ stock.currency }}</td>
+        <td style="width: 2%; color:{{ stock.font_color }}">{{ stock.caret_up_down }}</td>
+        <td style="width: 7%; color:{{ stock.font_color }}">{{ stock.price }}</td>
+        <td style="width: 7%; color:{{ stock.font_color }}">{{ stock.day_change }}</td>
+        <td style="width: 7%; color:{{ stock.font_color }}"">{{ stock.change_pct }}%</td>
+        <td width="7%"> {{ stock.day_low }}</td>
+        <td width="7%">{{ stock.day_high }}</td>
+        <td width="7%">{{ stock.close_yesterday }}</td>
+        {% if current_date > stock.last_trade_time|date:"Y-m-d" %}
+          <td width="12%">{{ stock.last_trade_time|date:"j M y, H:i" }}</td>
+        {% else %}
+          <td width="12%">{{ stock.last_trade_time|date:"h:i a" }}</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </table>
+  </div>
+  <small>Data provided by <a href="https://{{ data_provider_url }}">{{ data_provider_url }}</a></small>
+
+</form>
+<br><br><br><br>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+var form = document.getElementById('id_stockquote');
+
+function SubmitQuoteString(QuoteString) {
+  var EnteredStockString = prompt('Give symbols or company names', QuoteString);
+  if (EnteredStockString != null && EnteredStockString != "''" && EnteredStockString != '') {
+    form.quote_string.value = EnteredStockString;
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+</script>
+{% endblock %}

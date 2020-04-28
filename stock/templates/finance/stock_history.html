@@ -1,0 +1,44 @@
+{% extends 'base.html' %}<html>
+
+{% load static %}
+
+{%block title %}Stock History{% endblock %}
+
+{% block navbutton %}
+<ul class="navbar-nav mr-auto">
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle mr-1" href="#" data-toggle="dropdown">
+      Stock history
+    </a>
+    <div class="dropdown-menu dropdown-menu-left">
+      <a class="dropdown-item" href="{% url 'stock_intraday' source stock_symbol %}">Latest stock trading</a>
+      {% if source == 'quotes' %}
+        <a class="dropdown-item" href="{% url 'stock_quotes' %}">Quotes</a>
+      {% else %}
+        <a class="dropdown-item" href="{% url 'portfolio' %}">Portfolio</a>
+      {% endif %}
+      <a class="dropdown-item" href="{% url 'home' %}">Home</a>
+    </div>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+
+	<div id="chart-container">FusionCharts()</div>
+	<div>
+    <button class="btn btn-primary btn-sm"
+      onclick="window.location.href='{% url 'stock_intraday' source stock_symbol %}'">Latest stock trading</button>
+    </div>
+	<br>
+	<small>Data provided by <a href="https://{{ data_provider_url }}">{{ data_provider_url }}</a></small>
+	<br><br><br><br>
+
+{% endblock content %}
+
+{% block javascript %}
+	<script type="text/javascript" src="{% static "fusioncharts/types/fusioncharts.js" %}"></script>
+	<script type="text/javascript" src="{% static "fusioncharts/themes/fusioncharts.theme.candy.js" %}"></script>
+  <script type="text/javascript" src="{% static "fusioncharts/themes/fusioncharts.theme.fusion.js" %}"></script>
+	{{ chart_js|safe }}
+{% endblock javascript %}
