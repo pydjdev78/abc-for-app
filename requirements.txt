@@ -11,7 +11,7 @@ gunicorn==20.0.4
 idna==2.8
 Markdown
 martor==1.4.0
-Pillow==6.2.1
+Pillow==8.1.1
 psycopg2-binary==2.8.4
 python-decouple==3.3
 pytz==2019.3
